@@ -60,6 +60,7 @@ export const STRINGS = {
     sending: "Sending…",
     thanksTitle: "Thank you! Your order is received 🎉",
     thanksText: "We will contact you soon to confirm. Order ref:",
+    back: "Back",
     backToStore: "Back to the store",
     notFound: "Product not found",
     errors: {
@@ -111,6 +112,7 @@ export const STRINGS = {
     sending: "Envoi…",
     thanksTitle: "Merci ! Votre commande est reçue 🎉",
     thanksText: "Nous vous contactons bientôt pour confirmer. Réf. commande :",
+    back: "Retour",
     backToStore: "Retour à la boutique",
     notFound: "Produit introuvable",
     errors: {
@@ -162,6 +164,7 @@ export const STRINGS = {
     sending: "جارٍ الإرسال…",
     thanksTitle: "شكرًا لك! تم استلام طلبك 🎉",
     thanksText: "سنتواصل معك قريبًا لتأكيد الطلب. رقم الطلب:",
+    back: "رجوع",
     backToStore: "العودة إلى المتجر",
     notFound: "المنتج غير موجود",
     errors: {
