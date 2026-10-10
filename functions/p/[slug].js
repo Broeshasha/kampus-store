@@ -1,6 +1,6 @@
 import { BRAND, STRINGS, pickLang } from "../_lib/i18n.js";
 import { sbGet } from "../_lib/supa.js";
-import { page, esc, money, allImages, shareIcon } from "../_lib/layout.js";
+import { page, esc, money, allImages, shareIcon, backIcon } from "../_lib/layout.js";
 
 export async function onRequestGet({ request, env, params }) {
   const lang = pickLang(request);
@@ -36,8 +36,11 @@ export async function onRequestGet({ request, env, params }) {
 
   const gallery = `
 <div class="gallery">
-  <div class="main-img">${imgs[0] ? `<img id="main-img" src="${esc(imgs[0])}" alt="${esc(product.name)}">` : ""}</div>
-  ${imgs.length > 1 ? `<div class="thumbs">${imgs.map((i) => `<img src="${esc(i)}" data-full="${esc(i)}" alt="">`).join("")}</div>` : ""}
+  <div class="slider" id="slider">
+    ${imgs.map((i, k) => `<div class="slide"><img src="${esc(i)}" alt="${esc(product.name)}"${k ? ' loading="lazy"' : ""}></div>`).join("")}
+  </div>
+  ${imgs.length > 1 ? `<div class="dots" id="dots">${imgs.map((_, k) => `<span class="${k ? "" : "on"}"></span>`).join("")}</div>
+  <div class="thumbs" id="thumbs">${imgs.map((i, k) => `<img src="${esc(i)}" data-idx="${k}" class="${k ? "" : "on"}" alt="">`).join("")}</div>` : ""}
 </div>`;
 
   const wilayaOpts =
@@ -72,6 +75,7 @@ export async function onRequestGet({ request, env, params }) {
 </div>`;
 
   const body = `
+<button type="button" class="back" data-back>${backIcon} <span>${esc(t.back)}</span></button>
 <section class="product">
   ${gallery}
   <div class="info">
