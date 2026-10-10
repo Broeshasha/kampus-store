@@ -24,6 +24,8 @@ export const PSTR = {
     stDelivered: "Delivered", stPending: "In progress", stDead: "Cancelled / returned", qty: "Qty",
     shareText: "{name} — order here:",
     inactive: "Your account is paused. Please contact us.", loading: "Loading…",
+    google: "Continue with Google", copyPage: "Copy page link",
+    inAppTip: "Google sign-in does not work inside Instagram, Facebook or TikTok. Open this page in Chrome or Safari.",
     errors: {
       invalid_credentials: "Wrong email or password.",
       weak_password: "Password must be at least 6 characters.",
@@ -34,6 +36,7 @@ export const PSTR = {
       rate_limit: "Too many attempts. Please wait a bit and try again.",
       not_confirmed: "Please confirm your email first (check your inbox).",
       generic: "Something went wrong. Please try again.",
+      oauth: "Google sign-in failed. Please try again.",
     },
   },
 
@@ -61,6 +64,8 @@ export const PSTR = {
     stDelivered: "Livrée", stPending: "En cours", stDead: "Annulée / retournée", qty: "Qté",
     shareText: "{name} — commandez ici :",
     inactive: "Votre compte est suspendu. Contactez-nous.", loading: "Chargement…",
+    google: "Continuer avec Google", copyPage: "Copier le lien de la page",
+    inAppTip: "La connexion Google ne fonctionne pas dans Instagram, Facebook ou TikTok. Ouvrez cette page dans Chrome ou Safari.",
     errors: {
       invalid_credentials: "E-mail ou mot de passe incorrect.",
       weak_password: "Le mot de passe doit contenir au moins 6 caractères.",
@@ -71,6 +76,7 @@ export const PSTR = {
       rate_limit: "Trop de tentatives. Patientez un peu puis réessayez.",
       not_confirmed: "Confirmez d'abord votre e-mail (vérifiez votre boîte).",
       generic: "Une erreur est survenue. Veuillez réessayer.",
+      oauth: "Échec de la connexion Google. Veuillez réessayer.",
     },
   },
 
@@ -98,6 +104,8 @@ export const PSTR = {
     stDelivered: "تم التسليم", stPending: "قيد المعالجة", stDead: "ملغى / مرتجع", qty: "الكمية",
     shareText: "{name} — اطلب من هنا:",
     inactive: "حسابك متوقف مؤقتًا. تواصل معنا.", loading: "جارٍ التحميل…",
+    google: "المتابعة باستخدام Google", copyPage: "نسخ رابط الصفحة",
+    inAppTip: "تسجيل الدخول عبر Google لا يعمل داخل إنستغرام أو فيسبوك أو تيك توك. افتح هذه الصفحة في Chrome أو Safari.",
     errors: {
       invalid_credentials: "البريد الإلكتروني أو كلمة المرور غير صحيحة.",
       weak_password: "يجب ألا تقل كلمة المرور عن 6 أحرف.",
@@ -108,6 +116,7 @@ export const PSTR = {
       rate_limit: "محاولات كثيرة. انتظر قليلًا ثم أعد المحاولة.",
       not_confirmed: "أكّد بريدك الإلكتروني أولًا (راجع رسائلك).",
       generic: "حدث خطأ. حاول مرة أخرى.",
+      oauth: "فشل تسجيل الدخول عبر Google. حاول مرة أخرى.",
     },
   },
 };
