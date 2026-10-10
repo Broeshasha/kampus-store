@@ -34,7 +34,7 @@ export async function onRequestGet({ request, env }) {
 <link rel="apple-touch-icon" href="${BRAND.logo}">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <link rel="stylesheet" href="/style.css">
 <link rel="stylesheet" href="/partners.css">
 </head>
@@ -51,8 +51,8 @@ export async function onRequestGet({ request, env }) {
 <main id="app" class="pmain"><p class="muted center pad">${esc(t.loading)}</p></main>
 <div id="toast" class="toast" hidden></div>
 <script>window.__CFG=${cfgJson};</script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
-<script src="/partners.js"></script>
+<script src="/partners-app.js"></script>
+<script>setTimeout(function(){if(!window.__PARTNERS_OK){var a=document.getElementById("app");if(a)a.innerHTML='<p class="error center pad">'+window.__CFG.T.loadFail+"</p>";}},6000);</script>
 </body>
 </html>`;
 
