@@ -80,15 +80,36 @@
     });
   }
 
-  // ---------- product page: gallery ----------
-  var main = document.getElementById("main-img");
-  document.querySelectorAll(".thumbs img").forEach(function (im) {
-    im.addEventListener("click", function () {
-      if (main) main.src = im.dataset.full;
-      document.querySelectorAll(".thumbs img").forEach(function (x) { x.classList.remove("on"); });
-      im.classList.add("on");
-    });
+  // ---------- product page: back button ----------
+  document.addEventListener("click", function (ev) {
+    var b = ev.target.closest("[data-back]");
+    if (!b) return;
+    ev.preventDefault();
+    var fromStore = false;
+    try { fromStore = document.referrer && new URL(document.referrer).origin === location.origin; } catch (e) {}
+    if (fromStore && history.length > 1) history.back(); else location.href = "/";
   });
+
+  // ---------- product page: swipe gallery ----------
+  var slider = document.getElementById("slider");
+  if (slider) {
+    var dots = [].slice.call(document.querySelectorAll("#dots span"));
+    var thumbs = [].slice.call(document.querySelectorAll("#thumbs img"));
+    var mark = function (i) {
+      dots.forEach(function (d, k) { d.classList.toggle("on", k === i); });
+      thumbs.forEach(function (t, k) { t.classList.toggle("on", k === i); });
+    };
+    slider.addEventListener("scroll", function () {
+      mark(Math.round(slider.scrollLeft / (slider.clientWidth || 1)));
+    }, { passive: true });
+    thumbs.forEach(function (t) {
+      t.addEventListener("click", function () {
+        var i = parseInt(t.dataset.idx, 10) || 0;
+        slider.scrollTo({ left: i * slider.clientWidth, behavior: "smooth" });
+        mark(i);
+      });
+    });
+  }
 
   // ---------- product page: order form ----------
   var form = document.getElementById("order-form");
