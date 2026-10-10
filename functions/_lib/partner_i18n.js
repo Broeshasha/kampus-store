@@ -24,6 +24,7 @@ export const PSTR = {
     stDelivered: "Delivered", stPending: "In progress", stDead: "Cancelled / returned", qty: "Qty",
     shareText: "{name} — order here:",
     inactive: "Your account is paused. Please contact us.", loading: "Loading…",
+    loadFail: "The page could not start. Please refresh. If it keeps happening, tell us (code: JS).",
     google: "Continue with Google", copyPage: "Copy page link",
     inAppTip: "Google sign-in does not work inside Instagram, Facebook or TikTok. Open this page in Chrome or Safari.",
     errors: {
@@ -64,6 +65,7 @@ export const PSTR = {
     stDelivered: "Livrée", stPending: "En cours", stDead: "Annulée / retournée", qty: "Qté",
     shareText: "{name} — commandez ici :",
     inactive: "Votre compte est suspendu. Contactez-nous.", loading: "Chargement…",
+    loadFail: "La page n'a pas pu démarrer. Actualisez. Si cela continue, dites-le-nous (code : JS).",
     google: "Continuer avec Google", copyPage: "Copier le lien de la page",
     inAppTip: "La connexion Google ne fonctionne pas dans Instagram, Facebook ou TikTok. Ouvrez cette page dans Chrome ou Safari.",
     errors: {
@@ -104,6 +106,7 @@ export const PSTR = {
     stDelivered: "تم التسليم", stPending: "قيد المعالجة", stDead: "ملغى / مرتجع", qty: "الكمية",
     shareText: "{name} — اطلب من هنا:",
     inactive: "حسابك متوقف مؤقتًا. تواصل معنا.", loading: "جارٍ التحميل…",
+    loadFail: "تعذّر تشغيل الصفحة. حدّثها. إذا استمرت المشكلة أخبرنا (الرمز: JS).",
     google: "المتابعة باستخدام Google", copyPage: "نسخ رابط الصفحة",
     inAppTip: "تسجيل الدخول عبر Google لا يعمل داخل إنستغرام أو فيسبوك أو تيك توك. افتح هذه الصفحة في Chrome أو Safari.",
     errors: {
