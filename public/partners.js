@@ -1,340 +1,122 @@
-(function () {
-  "use strict";
-  var CFG = window.__CFG || {};
-  var T = CFG.T || {};
-  var E = T.errors || {};
-  var app = document.getElementById("app");
+// Text of the advertiser (partners) website, in 3 languages.
+export const PSTR = {
+  en: {
+    dir: "ltr", currency: "DA",
+    title: "Partners", tagline: "Earn a commission on every order we deliver",
+    login: "Log in", signup: "Create account", email: "Email", password: "Password",
+    loginBtn: "Log in", signupBtn: "Create my account", forgot: "Forgot password?",
+    resetSent: "We sent a reset link to your email.",
+    checkEmail: "Check your email to confirm your account, then log in.",
+    newPasswordTitle: "New password", newPassword: "New password", savePassword: "Save", passwordSaved: "Password changed.",
+    registerTitle: "Last step — tell us about you",
+    registerHint: "We create your personal promo code automatically.",
+    name: "Full name", phone: "Phone (WhatsApp)", wilaya: "Wilaya", chooseWilaya: "Choose wilaya", createBtn: "Create my partner account",
+    logout: "Log out", hi: "Hello {name}", overview: "Overview", products: "Products", orders: "Orders", refresh: "Refresh",
+    balance: "Balance to be paid", balanceHint: "Delivered orders minus what we already paid you",
+    pending: "Pending (not delivered yet)", earned: "Total earned", paid: "Already paid",
+    ordersTotal: "All orders", delivered: "Delivered orders",
+    rate: "Your rate: {p}% of our profit on each delivered sale",
+    yourCode: "Your promo code", yourLink: "Your store link", copy: "Copy", copied: "Copied!", share: "Share",
+    payments: "Payments", noPayments: "No payments yet.",
+    searchProducts: "Search products…", price: "Price", earnPer: "You earn", perSale: "per sale",
+    inStock: "In stock: {n}", lowStock: "Only {n} left", outStock: "Out of stock", ifSoldAll: "If you sell all",
+    copyLink: "Copy link", noProducts: "No products.", noOrders: "No orders yet.",
+    stDelivered: "Delivered", stPending: "In progress", stDead: "Cancelled / returned", qty: "Qty",
+    shareText: "{name} — order here:",
+    inactive: "Your account is paused. Please contact us.", loading: "Loading…",
+    google: "Continue with Google", copyPage: "Copy page link",
+    inAppTip: "Google sign-in does not work inside Instagram, Facebook or TikTok. Open this page in Chrome or Safari.",
+    errors: {
+      invalid_credentials: "Wrong email or password.",
+      weak_password: "Password must be at least 6 characters.",
+      email_exists: "This email is already registered. Please log in.",
+      invalid_name: "Please enter your full name.",
+      invalid_phone: "Phone number is not valid.",
+      invalid_wilaya: "Please choose your wilaya.",
+      rate_limit: "Too many attempts. Please wait a bit and try again.",
+      not_confirmed: "Please confirm your email first (check your inbox).",
+      generic: "Something went wrong. Please try again.",
+      oauth: "Google sign-in failed. Please try again.",
+    },
+  },
 
-  if (!window.supabase) {
-    app.innerHTML = '<p class="error center pad">' + (E.generic || "Error") + "</p>";
-    return;
-  }
-  var sb = window.supabase.createClient(CFG.url, CFG.anon);
+  fr: {
+    dir: "ltr", currency: "DA",
+    title: "Espace partenaires", tagline: "Gagnez une commission sur chaque commande livrée",
+    login: "Connexion", signup: "Créer un compte", email: "E-mail", password: "Mot de passe",
+    loginBtn: "Se connecter", signupBtn: "Créer mon compte", forgot: "Mot de passe oublié ?",
+    resetSent: "Nous avons envoyé un lien de réinitialisation à votre e-mail.",
+    checkEmail: "Vérifiez votre e-mail pour confirmer votre compte, puis connectez-vous.",
+    newPasswordTitle: "Nouveau mot de passe", newPassword: "Nouveau mot de passe", savePassword: "Enregistrer", passwordSaved: "Mot de passe modifié.",
+    registerTitle: "Dernière étape — parlez-nous de vous",
+    registerHint: "Nous créons automatiquement votre code promo personnel.",
+    name: "Nom complet", phone: "Téléphone (WhatsApp)", wilaya: "Wilaya", chooseWilaya: "Choisir la wilaya", createBtn: "Créer mon compte partenaire",
+    logout: "Déconnexion", hi: "Bonjour {name}", overview: "Résumé", products: "Produits", orders: "Commandes", refresh: "Actualiser",
+    balance: "Solde à payer", balanceHint: "Commandes livrées moins ce que nous vous avons déjà payé",
+    pending: "En attente (pas encore livré)", earned: "Total gagné", paid: "Déjà payé",
+    ordersTotal: "Toutes les commandes", delivered: "Commandes livrées",
+    rate: "Votre taux : {p}% de notre bénéfice sur chaque vente livrée",
+    yourCode: "Votre code promo", yourLink: "Votre lien de la boutique", copy: "Copier", copied: "Copié !", share: "Partager",
+    payments: "Paiements", noPayments: "Aucun paiement pour le moment.",
+    searchProducts: "Rechercher un produit…", price: "Prix", earnPer: "Vous gagnez", perSale: "par vente",
+    inStock: "En stock : {n}", lowStock: "Plus que {n}", outStock: "Rupture de stock", ifSoldAll: "Si vous vendez tout",
+    copyLink: "Copier le lien", noProducts: "Aucun produit.", noOrders: "Aucune commande pour le moment.",
+    stDelivered: "Livrée", stPending: "En cours", stDead: "Annulée / retournée", qty: "Qté",
+    shareText: "{name} — commandez ici :",
+    inactive: "Votre compte est suspendu. Contactez-nous.", loading: "Chargement…",
+    google: "Continuer avec Google", copyPage: "Copier le lien de la page",
+    inAppTip: "La connexion Google ne fonctionne pas dans Instagram, Facebook ou TikTok. Ouvrez cette page dans Chrome ou Safari.",
+    errors: {
+      invalid_credentials: "E-mail ou mot de passe incorrect.",
+      weak_password: "Le mot de passe doit contenir au moins 6 caractères.",
+      email_exists: "Cet e-mail est déjà inscrit. Connectez-vous.",
+      invalid_name: "Veuillez saisir votre nom complet.",
+      invalid_phone: "Numéro de téléphone invalide.",
+      invalid_wilaya: "Veuillez choisir votre wilaya.",
+      rate_limit: "Trop de tentatives. Patientez un peu puis réessayez.",
+      not_confirmed: "Confirmez d'abord votre e-mail (vérifiez votre boîte).",
+      generic: "Une erreur est survenue. Veuillez réessayer.",
+      oauth: "Échec de la connexion Google. Veuillez réessayer.",
+    },
+  },
 
-  var S = {
-    authTab: "login", tab: "overview", dash: null,
-    products: [], orders: [], payouts: [], wilayas: [],
-    recovery: false, msg: "", msgOk: false
-  };
-  var routing = false;
-
-  // ---------- helpers ----------
-  function esc(s) {
-    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
-      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
-    });
-  }
-  function money(n) {
-    return String(Math.round(Number(n) || 0)).replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " " + (T.currency || "DA");
-  }
-  function fill(str, o) {
-    return String(str || "").replace(/\{(\w+)\}/g, function (_, k) { return o[k] != null ? o[k] : ""; });
-  }
-  function toast(msg) {
-    var t = document.getElementById("toast");
-    t.textContent = msg; t.hidden = false;
-    clearTimeout(toast._t);
-    toast._t = setTimeout(function () { t.hidden = true; }, 2000);
-  }
-  function fmtDate(x) {
-    var loc = CFG.lang === "ar" ? "ar-DZ-u-nu-latn" : CFG.lang === "fr" ? "fr-FR" : "en-GB";
-    try { return new Date(x).toLocaleDateString(loc, { day: "numeric", month: "short", year: "numeric" }); }
-    catch (e) { return ""; }
-  }
-  // find the first picture whatever the format of the "images" column
-  function firstImage(images) {
-    var found = "";
-    (function walk(x, d) {
-      if (found || x == null || d > 5) return;
-      if (typeof x === "string") {
-        var v = x.trim();
-        if (v[0] === "[" || v[0] === "{") { try { return walk(JSON.parse(v), d + 1); } catch (e) {} }
-        if (/^(https?:)?\/\//i.test(v) || v[0] === "/") found = v;
-        return;
-      }
-      if (Array.isArray(x)) { x.forEach(function (y) { walk(y, d + 1); }); return; }
-      if (typeof x === "object") {
-        var keys = ["url", "src", "publicUrl", "image", "image_url", "original", "large", "full"];
-        for (var i = 0; i < keys.length; i++) if (typeof x[keys[i]] === "string" && x[keys[i]]) return walk(x[keys[i]], d + 1);
-        Object.keys(x).forEach(function (k) { walk(x[k], d + 1); });
-      }
-    })(images, 0);
-    return found;
-  }
-  function errText(err) {
-    var m = String((err && (err.message || err)) || "").toLowerCase();
-    if (m.indexOf("invalid login") > -1) return E.invalid_credentials;
-    if (m.indexOf("already registered") > -1 || m.indexOf("already been registered") > -1) return E.email_exists;
-    if (m.indexOf("at least") > -1 && m.indexOf("password") > -1) return E.weak_password;
-    if (m.indexOf("rate limit") > -1 || m.indexOf("too many") > -1) return E.rate_limit;
-    if (m.indexOf("not confirmed") > -1) return E.not_confirmed;
-    var keys = ["invalid_name", "invalid_phone", "invalid_wilaya"];
-    for (var i = 0; i < keys.length; i++) if (m.indexOf(keys[i]) > -1) return E[keys[i]];
-    return E.generic;
-  }
-  function linkFor(slug) {
-    return CFG.store + "/p/" + encodeURIComponent(slug) + "?ref=" + encodeURIComponent(S.dash.promo_code);
-  }
-  function storeLink() { return CFG.store + "/?ref=" + encodeURIComponent(S.dash.promo_code); }
-  function setLoggedIn(on) { document.getElementById("logout").hidden = !on; }
-
-  // ---------- language buttons ----------
-  document.querySelectorAll("[data-lang]").forEach(function (b) {
-    b.addEventListener("click", function () {
-      document.cookie = "lang=" + b.dataset.lang + "; path=/; max-age=31536000; SameSite=Lax";
-      location.reload();
-    });
-  });
-
-  // ---------- views ----------
-  function msgHtml() {
-    return S.msg ? '<p class="' + (S.msgOk ? "ok" : "error") + '">' + esc(S.msg) + "</p>" : "";
-  }
-
-  function viewAuth() {
-    var login = S.authTab === "login";
-    return '<section class="box auth">' +
-      "<h1>" + esc(T.title) + '</h1><p class="muted">' + esc(T.tagline) + "</p>" +
-      '<div class="seg">' +
-        '<button type="button" data-authtab="login" class="' + (login ? "on" : "") + '">' + esc(T.login) + "</button>" +
-        '<button type="button" data-authtab="signup" class="' + (!login ? "on" : "") + '">' + esc(T.signup) + "</button>" +
-      "</div>" +
-      '<form id="auth-form" class="form flat" novalidate>' +
-        "<label>" + esc(T.email) + '<input name="email" type="email" dir="ltr" autocomplete="email" required></label>' +
-        "<label>" + esc(T.password) + '<input name="password" type="password" dir="ltr" minlength="6" autocomplete="' + (login ? "current-password" : "new-password") + '" required></label>' +
-        msgHtml() +
-        '<button class="btn big" type="submit">' + esc(login ? T.loginBtn : T.signupBtn) + "</button>" +
-        (login ? '<button type="button" id="forgot" class="link">' + esc(T.forgot) + "</button>" : "") +
-      "</form></section>";
-  }
-
-  function viewRecovery() {
-    return '<section class="box auth"><h1>' + esc(T.newPasswordTitle) + "</h1>" +
-      '<form id="recovery-form" class="form flat" novalidate>' +
-        "<label>" + esc(T.newPassword) + '<input name="password" type="password" dir="ltr" minlength="6" autocomplete="new-password" required></label>' +
-        msgHtml() +
-        '<button class="btn big" type="submit">' + esc(T.savePassword) + "</button></form></section>";
-  }
-
-  function viewRegister() {
-    var opts = '<option value="">' + esc(T.chooseWilaya) + "</option>" +
-      S.wilayas.map(function (w) { return '<option value="' + esc(w.id) + '">' + esc(w.name) + "</option>"; }).join("");
-    return '<section class="box auth"><h1>' + esc(T.registerTitle) + '</h1><p class="muted">' + esc(T.registerHint) + "</p>" +
-      '<form id="reg-form" class="form flat" novalidate>' +
-        "<label>" + esc(T.name) + '<input name="name" autocomplete="name" required></label>' +
-        "<label>" + esc(T.phone) + '<input name="phone" type="tel" dir="ltr" autocomplete="tel" required></label>' +
-        "<label>" + esc(T.wilaya) + '<select name="wilaya" required>' + opts + "</select></label>" +
-        msgHtml() +
-        '<button class="btn big" type="submit">' + esc(T.createBtn) + "</button></form></section>";
-  }
-
-  function viewInactive() { return '<section class="box center"><p>' + esc(T.inactive) + "</p></section>"; }
-
-  function statBox(label, value, cls, hint) {
-    return '<div class="stat ' + (cls || "") + '"><span>' + esc(label) + "</span><strong>" + value + "</strong>" +
-      (hint ? "<small>" + esc(hint) + "</small>" : "") + "</div>";
-  }
-
-  function viewOverview() {
-    var d = S.dash;
-    var pays = S.payouts.length
-      ? S.payouts.map(function (p) {
-          return '<li><span>' + esc(fmtDate(p.paid_at)) + (p.method ? " · " + esc(p.method) : "") + "</span><b>" + money(p.amount_dzd) + "</b></li>";
-        }).join("")
-      : '<li class="muted">' + esc(T.noPayments) + "</li>";
-    return '<div class="stats">' +
-        statBox(T.balance, money(d.balance_dzd), "main", T.balanceHint) +
-        statBox(T.pending, money(d.pending_dzd)) +
-        statBox(T.earned, money(d.earned_dzd)) +
-        statBox(T.paid, money(d.paid_dzd)) +
-        statBox(T.ordersTotal, d.orders_total) +
-        statBox(T.delivered, d.orders_delivered) +
-      "</div>" +
-      '<p class="muted small center">' + esc(fill(T.rate, { p: d.commission_percent })) + "</p>" +
-      '<div class="box"><div class="kv"><span>' + esc(T.yourCode) + '</span><b class="code" dir="ltr">' + esc(d.promo_code) + "</b>" +
-        '<button class="mini" type="button" data-copy="' + esc(d.promo_code) + '">' + esc(T.copy) + "</button></div>" +
-      '<div class="kv"><span>' + esc(T.yourLink) + '</span><b class="url" dir="ltr">' + esc(storeLink()) + "</b>" +
-        '<button class="mini" type="button" data-copy="' + esc(storeLink()) + '">' + esc(T.copy) + "</button>" +
-        '<button class="mini" type="button" data-share data-url="' + esc(storeLink()) + '" data-title="' + esc(fill(T.shareText, { name: "Kampus Store" })) + '">' + esc(T.share) + "</button></div></div>" +
-      '<div class="box"><h3>' + esc(T.payments) + '</h3><ul class="list">' + pays + "</ul></div>";
-  }
-
-  function viewProducts() {
-    var list = S.products.slice().sort(function (a, b) { return b.earn_per_unit - a.earn_per_unit; });
-    var cards = list.map(function (p) {
-      var img = firstImage(p.images);
-      var stockTxt = p.stock <= 0 ? T.outStock : p.stock <= 5 ? fill(T.lowStock, { n: p.stock }) : fill(T.inStock, { n: p.stock });
-      var stockCls = p.stock <= 0 ? "out" : p.stock <= 5 ? "low" : "";
-      var url = linkFor(p.slug);
-      return '<article class="pcard" data-name="' + esc(String(p.name || "").toLowerCase()) + '">' +
-        '<div class="pimg">' + (img ? '<img loading="lazy" src="' + esc(img) + '" alt="">' : "") + "</div>" +
-        '<div class="pinfo"><h3>' + esc(p.name) + "</h3>" +
-          '<div class="muted small">' + esc(T.price) + ": " + money(p.sell_price) + "</div>" +
-          '<div class="earn">' + esc(T.earnPer) + " <b>" + money(p.earn_per_unit) + "</b> " + esc(T.perSale) + "</div>" +
-          '<div class="stock ' + stockCls + '">' + esc(stockTxt) +
-            (p.stock > 0 && p.earn_per_unit > 0 ? " · " + esc(T.ifSoldAll) + ": <b>" + money(p.stock * p.earn_per_unit) + "</b>" : "") + "</div>" +
-          '<div class="actions">' +
-            '<button class="mini" type="button" data-copy="' + esc(url) + '">' + esc(T.copyLink) + "</button>" +
-            '<button class="mini solid" type="button" data-share data-url="' + esc(url) + '" data-title="' + esc(fill(T.shareText, { name: p.name })) + '">' + esc(T.share) + "</button>" +
-          "</div></div></article>";
-    }).join("");
-    return '<input id="pq" class="search" type="search" placeholder="' + esc(T.searchProducts) + '">' +
-      '<div class="plist">' + (cards || '<p class="muted center">' + esc(T.noProducts) + "</p>") + "</div>";
-  }
-
-  function viewOrders() {
-    if (!S.orders.length) return '<p class="muted center pad">' + esc(T.noOrders) + "</p>";
-    var label = { delivered: T.stDelivered, pending: T.stPending, dead: T.stDead };
-    return '<ul class="olist">' + S.orders.map(function (o) {
-      return '<li class="order ' + esc(o.bucket) + '">' +
-        '<div class="o-top"><b>' + esc(o.product_name) + "</b><span> × " + esc(o.quantity) + "</span></div>" +
-        '<div class="muted small">' + esc(o.buyer_first_name) + " · " + esc(o.buyer_wilaya) + " · " + esc(fmtDate(o.created_at)) + "</div>" +
-        '<div class="o-bot"><span class="pill ' + esc(o.bucket) + '">' + esc(label[o.bucket] || o.status) + "</span>" +
-        '<b class="com">' + money(o.commission_dzd) + "</b></div></li>";
-    }).join("") + "</ul>";
-  }
-
-  function viewDash() {
-    var tabs = [["overview", T.overview], ["products", T.products], ["orders", T.orders]];
-    var body = S.tab === "products" ? viewProducts() : S.tab === "orders" ? viewOrders() : viewOverview();
-    return '<div class="greet"><h1>' + esc(fill(T.hi, { name: S.dash.display_name })) + "</h1>" +
-      '<button id="refresh" class="mini" type="button">↻ ' + esc(T.refresh) + "</button></div>" +
-      '<nav class="seg tabs">' + tabs.map(function (t) {
-        return '<button type="button" data-tab="' + t[0] + '" class="' + (S.tab === t[0] ? "on" : "") + '">' + esc(t[1]) + "</button>";
-      }).join("") + "</nav>" + body;
-  }
-
-  function render(view) {
-    var map = { auth: viewAuth, recovery: viewRecovery, register: viewRegister, inactive: viewInactive, dash: viewDash };
-    app.innerHTML = view === "loading" ? '<p class="muted center pad">' + esc(T.loading) + "</p>" : map[view]();
-  }
-
-  // ---------- data ----------
-  async function loadWilayas() {
-    if (S.wilayas.length) return;
-    var r = await sb.from("wilayas").select("id,name").order("id");
-    S.wilayas = r.data || [];
-  }
-  async function loadAll() {
-    var r = await Promise.all([
-      sb.rpc("get_my_dashboard"),
-      sb.rpc("get_my_products"),
-      sb.rpc("get_my_orders"),
-      sb.from("advertiser_payouts").select("amount_dzd,method,paid_at").order("paid_at", { ascending: false })
-    ]);
-    if (r[0].data && !r[0].data.inactive) S.dash = r[0].data;
-    S.products = r[1].data || [];
-    S.orders = r[2].data || [];
-    S.payouts = r[3].data || [];
-  }
-
-  async function route() {
-    if (routing) return;
-    routing = true;
-    try {
-      var s = await sb.auth.getSession();
-      var session = s.data && s.data.session;
-      if (!session) { S.dash = null; setLoggedIn(false); render("auth"); return; }
-      setLoggedIn(true);
-      if (S.recovery) { render("recovery"); return; }
-      render("loading");
-      var d = await sb.rpc("get_my_dashboard");
-      if (d.error) throw d.error;
-      if (!d.data) { await loadWilayas(); S.dash = null; render("register"); return; }
-      if (d.data.inactive) { render("inactive"); return; }
-      await loadAll();
-      render("dash");
-    } catch (e) {
-      console.error(e);
-      app.innerHTML = '<p class="error center pad">' + esc(E.generic) + "</p>";
-    } finally {
-      routing = false;
-    }
-  }
-
-  // ---------- events ----------
-  app.addEventListener("click", function (ev) {
-    var t = ev.target.closest("button");
-    if (!t) return;
-    if (t.dataset.authtab) { S.authTab = t.dataset.authtab; S.msg = ""; render("auth"); return; }
-    if (t.dataset.tab) { S.tab = t.dataset.tab; render("dash"); return; }
-    if (t.dataset.copy) {
-      (navigator.clipboard ? navigator.clipboard.writeText(t.dataset.copy) : Promise.reject())
-        .then(function () { toast(T.copied); })
-        .catch(function () { window.prompt("", t.dataset.copy); });
-      return;
-    }
-    if (t.hasAttribute("data-share")) {
-      var url = t.dataset.url, title = t.dataset.title || "";
-      if (navigator.share) navigator.share({ title: title, text: title, url: url }).catch(function () {});
-      else if (navigator.clipboard) navigator.clipboard.writeText(url).then(function () { toast(T.copied); });
-      return;
-    }
-    if (t.id === "refresh") { loadAll().then(function () { render("dash"); }); return; }
-    if (t.id === "forgot") {
-      var email = (app.querySelector("input[name=email]") || {}).value;
-      if (!email) return;
-      sb.auth.resetPasswordForEmail(email, { redirectTo: location.origin + "/partners" }).then(function (r) {
-        S.msg = r.error ? errText(r.error) : T.resetSent; S.msgOk = !r.error; render("auth");
-      });
-    }
-  });
-
-  app.addEventListener("input", function (ev) {
-    if (ev.target.id !== "pq") return;
-    var term = ev.target.value.trim().toLowerCase();
-    app.querySelectorAll(".pcard").forEach(function (c) { c.hidden = term && c.dataset.name.indexOf(term) === -1; });
-  });
-
-  app.addEventListener("submit", async function (ev) {
-    ev.preventDefault();
-    var f = ev.target, btn = f.querySelector("button[type=submit]");
-    btn.disabled = true;
-    S.msg = ""; S.msgOk = false;
-    try {
-      if (f.id === "auth-form") {
-        var email = f.elements.email.value.trim(), password = f.elements.password.value;
-        var r;
-        if (S.authTab === "login") {
-          r = await sb.auth.signInWithPassword({ email: email, password: password });
-          if (r.error) throw r.error;
-          await route();
-        } else {
-          r = await sb.auth.signUp({ email: email, password: password, options: { emailRedirectTo: location.origin + "/partners" } });
-          if (r.error) throw r.error;
-          if (r.data && r.data.session) await route();
-          else { S.authTab = "login"; S.msg = T.checkEmail; S.msgOk = true; render("auth"); }
-        }
-      } else if (f.id === "reg-form") {
-        var rr = await sb.rpc("register_advertiser", {
-          p_name: f.elements.name.value, p_phone: f.elements.phone.value, p_wilaya: parseInt(f.elements.wilaya.value, 10)
-        });
-        if (rr.error) throw rr.error;
-        await route();
-      } else if (f.id === "recovery-form") {
-        var up = await sb.auth.updateUser({ password: f.elements.password.value });
-        if (up.error) throw up.error;
-        S.recovery = false;
-        toast(T.passwordSaved);
-        await route();
-      }
-    } catch (e) {
-      S.msg = errText(e);
-      var v = f.id === "reg-form" ? "register" : f.id === "recovery-form" ? "recovery" : "auth";
-      render(v);
-    }
-  });
-
-  document.getElementById("logout").addEventListener("click", async function () {
-    await sb.auth.signOut();
-    S.dash = null; S.tab = "overview"; S.msg = "";
-    route();
-  });
-
-  sb.auth.onAuthStateChange(function (event) {
-    if (event === "PASSWORD_RECOVERY") { S.recovery = true; setTimeout(route, 0); }
-    else if (event === "SIGNED_IN" && !S.dash && !S.recovery) setTimeout(route, 0);
-  });
-
-  route();
-})();
+  ar: {
+    dir: "rtl", currency: "د.ج",
+    title: "فضاء الشركاء", tagline: "اربح عمولة على كل طلب يتم تسليمه",
+    login: "تسجيل الدخول", signup: "إنشاء حساب", email: "البريد الإلكتروني", password: "كلمة المرور",
+    loginBtn: "دخول", signupBtn: "إنشاء حسابي", forgot: "نسيت كلمة المرور؟",
+    resetSent: "أرسلنا رابط إعادة التعيين إلى بريدك الإلكتروني.",
+    checkEmail: "تحقق من بريدك الإلكتروني لتأكيد الحساب، ثم سجّل الدخول.",
+    newPasswordTitle: "كلمة مرور جديدة", newPassword: "كلمة المرور الجديدة", savePassword: "حفظ", passwordSaved: "تم تغيير كلمة المرور.",
+    registerTitle: "خطوة أخيرة — عرّفنا بنفسك",
+    registerHint: "سننشئ لك رمز ترويج خاصًا بك تلقائيًا.",
+    name: "الاسم الكامل", phone: "رقم الهاتف (واتساب)", wilaya: "الولاية", chooseWilaya: "اختر الولاية", createBtn: "إنشاء حساب الشريك",
+    logout: "خروج", hi: "مرحبًا {name}", overview: "الملخص", products: "المنتجات", orders: "الطلبات", refresh: "تحديث",
+    balance: "رصيدك المستحق", balanceHint: "الطلبات المسلّمة ناقص ما دفعناه لك",
+    pending: "قيد الانتظار (لم يُسلَّم بعد)", earned: "إجمالي الأرباح", paid: "ما تم دفعه",
+    ordersTotal: "كل الطلبات", delivered: "الطلبات المسلّمة",
+    rate: "نسبتك: {p}% من ربحنا على كل بيع مسلَّم",
+    yourCode: "رمز الترويج الخاص بك", yourLink: "رابط المتجر الخاص بك", copy: "نسخ", copied: "تم النسخ!", share: "مشاركة",
+    payments: "الدفعات", noPayments: "لا توجد دفعات بعد.",
+    searchProducts: "ابحث عن منتج…", price: "السعر", earnPer: "ربحك", perSale: "لكل بيع",
+    inStock: "المتوفر: {n}", lowStock: "بقي {n} فقط", outStock: "نفدت الكمية", ifSoldAll: "إن بعت الكل",
+    copyLink: "نسخ الرابط", noProducts: "لا توجد منتجات.", noOrders: "لا توجد طلبات بعد.",
+    stDelivered: "تم التسليم", stPending: "قيد المعالجة", stDead: "ملغى / مرتجع", qty: "الكمية",
+    shareText: "{name} — اطلب من هنا:",
+    inactive: "حسابك متوقف مؤقتًا. تواصل معنا.", loading: "جارٍ التحميل…",
+    google: "المتابعة باستخدام Google", copyPage: "نسخ رابط الصفحة",
+    inAppTip: "تسجيل الدخول عبر Google لا يعمل داخل إنستغرام أو فيسبوك أو تيك توك. افتح هذه الصفحة في Chrome أو Safari.",
+    errors: {
+      invalid_credentials: "البريد الإلكتروني أو كلمة المرور غير صحيحة.",
+      weak_password: "يجب ألا تقل كلمة المرور عن 6 أحرف.",
+      email_exists: "هذا البريد مسجّل مسبقًا. سجّل الدخول.",
+      invalid_name: "الرجاء إدخال اسمك الكامل.",
+      invalid_phone: "رقم الهاتف غير صحيح.",
+      invalid_wilaya: "الرجاء اختيار الولاية.",
+      rate_limit: "محاولات كثيرة. انتظر قليلًا ثم أعد المحاولة.",
+      not_confirmed: "أكّد بريدك الإلكتروني أولًا (راجع رسائلك).",
+      generic: "حدث خطأ. حاول مرة أخرى.",
+      oauth: "فشل تسجيل الدخول عبر Google. حاول مرة أخرى.",
+    },
+  },
+};
