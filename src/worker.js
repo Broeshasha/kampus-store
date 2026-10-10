@@ -4,6 +4,7 @@ import * as home from "../functions/index.js";
 import * as product from "../functions/p/[slug].js";
 import * as order from "../functions/api/order.js";
 import * as communes from "../functions/api/communes.js";
+import * as partners from "../functions/partners.js";
 
 export default {
   async fetch(request, env) {
@@ -19,6 +20,8 @@ export default {
       if (p && isRead) {
         return await product.onRequestGet({ request, env, params: { slug: decodeURIComponent(p[1]) } });
       }
+
+      if ((path === "/partners" || path === "/partners/") && isRead) return await partners.onRequestGet({ request, env });
 
       if (path === "/api/order" && method === "POST") return await order.onRequestPost({ request, env });
       if (path === "/api/communes" && isRead) return await communes.onRequestGet({ request, env });
