@@ -83,7 +83,7 @@ export async function onRequestPost({ request, env }) {
     const [order] = await sbInsert(env, "kampus_store_orders", {
       product_id: product.id,
       quantity: qty,
-      status: "pending",
+      status: "pending_call",
       buyer_full_name: name,
       buyer_phone: phone,
       buyer_wilaya: wilaya.name,
