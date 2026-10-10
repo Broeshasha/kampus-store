@@ -6,13 +6,37 @@ export const esc = (s) =>
 export const money = (n, currency) =>
   new Intl.NumberFormat("fr-FR").format(Number(n) || 0).replace(/[\u202f\u00a0]/g, " ") + " " + currency;
 
+// Finds every image link inside the "images" column, whatever its format
+// (list of links, list of objects, nested object, or text containing JSON).
+const IMG_START = /^(https?:)?\/\//i;
+const ONE_IMAGE_KEYS = ["url", "src", "publicUrl", "image", "image_url", "original", "large", "full"];
 export function allImages(images) {
-  const arr = Array.isArray(images) ? images : images ? [images] : [];
-  return arr
-    .map((x) => (typeof x === "string" ? x : (x && (x.url || x.src || x.publicUrl)) || ""))
-    .filter(Boolean);
+  const out = [];
+  const walk = (x, depth) => {
+    if (x == null || depth > 5) return;
+    if (typeof x === "string") {
+      const v = x.trim();
+      if (v[0] === "[" || v[0] === "{") {
+        try { return walk(JSON.parse(v), depth + 1); } catch (e) {}
+      }
+      if (IMG_START.test(v) || v[0] === "/") out.push(v);
+      return;
+    }
+    if (Array.isArray(x)) return x.forEach((y) => walk(y, depth + 1));
+    if (typeof x === "object") {
+      for (const k of ONE_IMAGE_KEYS) {
+        if (typeof x[k] === "string" && x[k]) return walk(x[k], depth + 1);
+      }
+      Object.values(x).forEach((y) => walk(y, depth + 1));
+    }
+  };
+  walk(images, 0);
+  return [...new Set(out)];
 }
 export const firstImage = (images) => allImages(images)[0] || "";
+
+export const backIcon =
+  '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>';
 
 export const shareIcon =
   '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>';
