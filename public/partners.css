@@ -57,3 +57,10 @@
 .pill.dead{background:#fee2e2;color:#b91c1c}
 .order.dead .com{text-decoration:line-through;color:var(--muted)}
 .order.delivered .com{color:#15803d}
+
+/* Google sign-in */
+.gbtn{display:flex;align-items:center;justify-content:center;gap:12px;width:100%;margin-top:18px;padding:14px;background:#fff;border:1px solid #cfd5e3;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;color:var(--ink)}
+.gbtn:hover{background:#f6f8fd}
+.gbtn[disabled]{opacity:.6;cursor:wait}
+.notice{background:#fff7e0;border:1px solid #f3d98a;border-radius:12px;padding:12px;margin-top:14px;font-size:14px}
+.notice p{margin:0 0 8px}
