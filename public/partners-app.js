@@ -242,12 +242,19 @@
 
   function viewOrders() {
     if (!S.orders.length) return '<p class="muted center pad">' + esc(T.noOrders) + "</p>";
-    var label = { delivered: T.stDelivered, pending: T.stPending, dead: T.stDead };
+    var ST = T.stages || {}, steps = T.steps || [];
+    var AT = { "new": 0, whatsapped: 1, sent: 2, no_answer: 2, wrong_number: 2, confirmed: 2, processing: 2, shipped: 3, delivered: 4 };
     return '<ul class="olist">' + S.orders.map(function (o) {
+      var dead = o.bucket === "dead";
+      var at = AT[o.stage] != null ? AT[o.stage] : 0;
+      var bar = '<ol class="pstep' + (dead ? " dead" : "") + '">' + steps.map(function (s, i) {
+        return '<li class="' + (!dead && i <= at ? "done" : "") + '"><i></i><span>' + esc(s) + "</span></li>";
+      }).join("") + "</ol>";
       return '<li class="order ' + esc(o.bucket) + '">' +
         '<div class="o-top"><b>' + esc(o.product_name) + "</b><span> × " + esc(o.quantity) + "</span></div>" +
         '<div class="muted small">' + esc(o.buyer_first_name) + " · " + esc(o.buyer_wilaya) + " · " + esc(fmtDate(o.created_at)) + "</div>" +
-        '<div class="o-bot"><span class="pill ' + esc(o.bucket) + '">' + esc(label[o.bucket] || o.status) + "</span>" +
+        bar +
+        '<div class="o-bot"><span class="pill ' + esc(o.bucket) + '">' + esc(ST[o.stage] || o.stage) + "</span>" +
         '<b class="com">' + money(o.commission_dzd) + "</b></div></li>";
     }).join("") + "</ul>";
   }
