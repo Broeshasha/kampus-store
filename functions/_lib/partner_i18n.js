@@ -25,6 +25,8 @@ export const PSTR = {
     shareText: "{name} — order here:",
     inactive: "Your account is paused. Please contact us.", loading: "Loading…",
     loadFail: "The page could not start. Please refresh. If it keeps happening, tell us (code: JS).",
+    stages: { new: "Received", whatsapped: "Contacted", sent: "Sent for delivery", confirmed: "Confirmed", no_answer: "Customer not answering", wrong_number: "Wrong number", processing: "Being prepared", shipped: "Shipped", delivered: "Delivered", returned: "Returned", cancelled: "Cancelled" },
+    steps: ["Received", "Contacted", "Sent", "Shipped", "Delivered"],
     google: "Continue with Google", copyPage: "Copy page link",
     inAppTip: "Google sign-in does not work inside Instagram, Facebook or TikTok. Open this page in Chrome or Safari.",
     errors: {
@@ -66,6 +68,8 @@ export const PSTR = {
     shareText: "{name} — commandez ici :",
     inactive: "Votre compte est suspendu. Contactez-nous.", loading: "Chargement…",
     loadFail: "La page n'a pas pu démarrer. Actualisez. Si cela continue, dites-le-nous (code : JS).",
+    stages: { new: "Reçue", whatsapped: "Contactée", sent: "Envoyée pour livraison", confirmed: "Confirmée", no_answer: "Client ne répond pas", wrong_number: "Numéro incorrect", processing: "En préparation", shipped: "Expédiée", delivered: "Livrée", returned: "Retournée", cancelled: "Annulée" },
+    steps: ["Reçue", "Contactée", "Envoyée", "Expédiée", "Livrée"],
     google: "Continuer avec Google", copyPage: "Copier le lien de la page",
     inAppTip: "La connexion Google ne fonctionne pas dans Instagram, Facebook ou TikTok. Ouvrez cette page dans Chrome ou Safari.",
     errors: {
@@ -107,6 +111,8 @@ export const PSTR = {
     shareText: "{name} — اطلب من هنا:",
     inactive: "حسابك متوقف مؤقتًا. تواصل معنا.", loading: "جارٍ التحميل…",
     loadFail: "تعذّر تشغيل الصفحة. حدّثها. إذا استمرت المشكلة أخبرنا (الرمز: JS).",
+    stages: { new: "تم الاستلام", whatsapped: "تم التواصل", sent: "أُرسل للتوصيل", confirmed: "تم التأكيد", no_answer: "الزبون لا يرد", wrong_number: "رقم خاطئ", processing: "قيد التحضير", shipped: "تم الشحن", delivered: "تم التسليم", returned: "مرتجع", cancelled: "ملغى" },
+    steps: ["تم الاستلام", "تم التواصل", "أُرسل", "تم الشحن", "تم التسليم"],
     google: "المتابعة باستخدام Google", copyPage: "نسخ رابط الصفحة",
     inAppTip: "تسجيل الدخول عبر Google لا يعمل داخل إنستغرام أو فيسبوك أو تيك توك. افتح هذه الصفحة في Chrome أو Safari.",
     errors: {
