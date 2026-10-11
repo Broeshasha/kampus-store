@@ -64,3 +64,13 @@
 .gbtn[disabled]{opacity:.6;cursor:wait}
 .notice{background:#fff7e0;border:1px solid #f3d98a;border-radius:12px;padding:12px;margin-top:14px;font-size:14px}
 .notice p{margin:0 0 8px}
+
+/* order progress bar for advertisers */
+.pstep{list-style:none;margin:8px 0 4px;padding:0;display:flex}
+.pstep li{flex:1;position:relative;text-align:center;font-size:11px;font-weight:700;color:#9aa0ae;padding-top:18px}
+.pstep li i{position:absolute;top:2px;inset-inline:0;margin:auto;width:12px;height:12px;border-radius:50%;background:#d8dce7;z-index:1}
+.pstep li::before{content:"";position:absolute;top:7px;inset-inline-start:-50%;inset-inline-end:50%;height:3px;background:#d8dce7}
+.pstep li:first-child::before{display:none}
+.pstep li.done{color:var(--ink)}
+.pstep li.done i,.pstep li.done::before{background:#16a34a}
+.pstep.dead li i,.pstep.dead li::before{background:#e3c3c3}
