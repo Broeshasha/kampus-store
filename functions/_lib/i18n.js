@@ -2,6 +2,7 @@
 export const BRAND = {
   name: "Kampus Store",
   logo: "/logo.png",
+  whatsapp: "213549087919", // +213 549 08 79 19  (support WhatsApp)
 };
 
 // ===== LANGUAGE: cookie first, then the phone's language, else French =====
@@ -60,6 +61,8 @@ export const STRINGS = {
     sending: "Sending…",
     thanksTitle: "Thank you! Your order is received 🎉",
     thanksText: "We will contact you soon to confirm. Order ref:",
+    waLabel: "Need help? WhatsApp us",
+    waHello: "Hello Kampus Store 👋 I need help.",
     back: "Back",
     backToStore: "Back to the store",
     notFound: "Product not found",
@@ -112,6 +115,8 @@ export const STRINGS = {
     sending: "Envoi…",
     thanksTitle: "Merci ! Votre commande est reçue 🎉",
     thanksText: "Nous vous contactons bientôt pour confirmer. Réf. commande :",
+    waLabel: "Un problème ? Écrivez-nous sur WhatsApp",
+    waHello: "Bonjour Kampus Store 👋 J'ai besoin d'aide.",
     back: "Retour",
     backToStore: "Retour à la boutique",
     notFound: "Produit introuvable",
@@ -164,6 +169,8 @@ export const STRINGS = {
     sending: "جارٍ الإرسال…",
     thanksTitle: "شكرًا لك! تم استلام طلبك 🎉",
     thanksText: "سنتواصل معك قريبًا لتأكيد الطلب. رقم الطلب:",
+    waLabel: "تحتاج مساعدة؟ راسلنا على واتساب",
+    waHello: "مرحبًا Kampus Store 👋 أحتاج إلى مساعدة.",
     back: "رجوع",
     backToStore: "العودة إلى المتجر",
     notFound: "المنتج غير موجود",
