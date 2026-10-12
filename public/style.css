@@ -99,3 +99,13 @@ button,input,select{font-family:inherit}
 .thumbs{display:flex;gap:8px;margin-top:8px;overflow-x:auto;direction:ltr;scrollbar-width:none}
 .thumbs img{width:64px;height:64px;object-fit:cover;border-radius:10px;border:2px solid transparent;cursor:pointer;flex:none;background:#fff}
 .thumbs img.on{border-color:var(--blue)}
+
+/* floating WhatsApp button */
+.wa-float{position:fixed;inset-inline-end:16px;bottom:16px;z-index:40;display:flex;align-items:center;gap:10px;background:#25d366;color:#fff;border-radius:999px;padding:12px;box-shadow:0 6px 18px rgba(0,0,0,.28);font-weight:800;font-size:14px;text-decoration:none;animation:waPulse 2.6s infinite}
+.wa-float:hover{background:#1ebe5a}
+.wa-float svg{flex:none;display:block}
+.wa-float span{display:none}
+@media(min-width:700px){.wa-float{padding:12px 20px 12px 14px}.wa-float span{display:inline}}
+@keyframes waPulse{0%{box-shadow:0 6px 18px rgba(0,0,0,.28),0 0 0 0 rgba(37,211,102,.55)}70%{box-shadow:0 6px 18px rgba(0,0,0,.28),0 0 0 14px rgba(37,211,102,0)}100%{box-shadow:0 6px 18px rgba(0,0,0,.28),0 0 0 0 rgba(37,211,102,0)}}
+@media(prefers-reduced-motion:reduce){.wa-float{animation:none}}
+.foot{padding-bottom:90px}
