@@ -125,6 +125,12 @@ async function refresh(env, admin, order) {
 }
 
 // ---- settings screen helpers ----
+function findSecret(o, depth = 0) {
+  if (!o || typeof o !== "object" || depth > 3) return null;
+  for (const [k, v] of Object.entries(o)) if (/secret/i.test(k) && typeof v === "string" && v) return v;
+  for (const v of Object.values(o)) { const f = findSecret(v, depth + 1); if (f) return f; }
+  return null;
+}
 const EVENTS = ["order.created", "order.confirmed", "order.processing", "order.shipped", "order.delivered", "order.cancelled", "order.returned", "stock.updated"];
 
 export async function handleAdmin(request, env) {
@@ -145,15 +151,35 @@ export async function handleAdmin(request, env) {
       return json({ ok: r.ok, status: r.status, message: r.ok ? "Connected to DropDZ." : errMsg(r) });
     }
     if (path === "dropdz-webhook-register") {
-      const existing = await getSetting(env, "dropdz_webhook_id");
-      if (existing && !body.force) return json({ ok: true, already: true, message: "Webhook is already registered." });
-      const r = await dz(env, "POST", "/webhooks", { url: url.origin + "/api/dropdz-webhook", events: EVENTS, description: "Kampus Store" });
-      if (!r.ok) return json({ ok: false, message: errMsg(r), status: r.status });
+      const ourUrl = url.origin + "/api/dropdz-webhook";
+      // remove old copies of OUR webhook first, so we always get a fresh secret and never create duplicates
+      let removed = 0;
+      const list = await dz(env, "GET", "/webhooks");
+      if (list.ok) {
+        const raw = list.json && (list.json.data || list.json);
+        for (const w of Array.isArray(raw) ? raw : []) {
+          if (w && w.url === ourUrl && w.id) {
+            const d = await dz(env, "DELETE", `/webhooks/${encodeURIComponent(w.id)}`);
+            if (d.ok) removed++;
+          }
+        }
+      }
+      const r = await dz(env, "POST", "/webhooks", { url: ourUrl, events: EVENTS, description: "Kampus Store" });
+      if (!r.ok) {
+        let hint = "";
+        if (r.status === 401) hint = " — the DROPDZ_API_KEY is wrong or was revoked.";
+        if (r.status === 403) hint = " — this DropDZ key does not have the permission webhooks:manage. Create a new key with it.";
+        return json({ ok: false, status: r.status, message: `DropDZ said (${r.status}): ` + String(errMsg(r)) + hint, detail: r.json });
+      }
       const d = (r.json && (r.json.data || r.json)) || {};
-      const secret = d.secret || d.signingSecret || d.webhookSecret || null;
-      if (d.id) await setSetting(env, "dropdz_webhook_id", d.id);
+      const secret = findSecret(d);
+      const id = d.id || (d.webhook && d.webhook.id) || null;
+      if (id) await setSetting(env, "dropdz_webhook_id", id);
       if (secret) await setSetting(env, "dropdz_webhook_secret", secret);
-      return json({ ok: true, secret_saved: !!secret, fields_returned: Object.keys(d), message: secret ? "Webhook connected." : "Webhook created, but DropDZ did not return a secret. Send the field list to your developer." });
+      return json({
+        ok: true, secret_saved: !!secret, removed_old: removed, fields_returned: Object.keys(d),
+        message: secret ? "Webhook connected ✓" : "Webhook created, but DropDZ did not send back a secret. Fields it returned: " + Object.keys(d).join(", "),
+      });
     }
     if (path === "reconcile") return json({ ok: true, ...(await reconcile(env)) });
 
