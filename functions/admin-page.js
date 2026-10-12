@@ -36,6 +36,7 @@ export async function onRequestGet({ request, env }) {
 <div id="toast" class="toast" hidden></div>
 <script>window.__CFG=${cfgJson};</script>
 <script src="/admin-app.js"></script>
+<script src="/admin-dash.js"></script>
 <script>setTimeout(function(){if(!window.__ADMIN_OK){var a=document.getElementById("app");if(a)a.innerHTML='<p class="error center pad">The page could not start. Refresh. If it keeps happening, check that public/admin-app.js exists on GitHub.</p>';}},6000);</script>
 </body>
 </html>`;
