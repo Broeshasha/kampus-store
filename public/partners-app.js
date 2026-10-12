@@ -285,7 +285,7 @@
       rpc("get_my_dashboard"),
       rpc("get_my_products").catch(soft),
       rpc("get_my_orders").catch(soft),
-      rest("advertiser_payouts?select=amount_dzd,method,paid_at&order=paid_at.desc").catch(soft)
+      rest("advertiser_payouts?select=amount_dzd,method,paid_at&voided_at=is.null&order=paid_at.desc").catch(soft)
     ]);
     if (r[0] && !r[0].inactive) S.dash = r[0];
     S.products = r[1] || [];
