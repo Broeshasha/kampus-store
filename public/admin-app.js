@@ -8,8 +8,8 @@
   var SKEY = "kampus_admin_session";
 
   var S = {
-    tab: "orders", group: "all", q: "", orders: [], counts: {}, me: "", busy: {},
-    loadedOnce: false, waLang: "fr", dz: null, dzMsg: ""
+    tab: null, group: "all", q: "", orders: [], counts: {}, me: "", busy: {},
+    loadedOnce: false, waLang: "fr", dz: null, dzMsg: "", dzLog: {}, dzDetail: ""
   };
   try { S.waLang = localStorage.getItem("kampus_wa_lang") || "fr"; } catch (e) {}
   var routing = false, timer = null, syncTimer = null;
@@ -211,10 +211,17 @@
     return S.orders.length ? S.orders.map(orderCard).join("") : '<p class="muted center pad">No orders here.</p>';
   }
 
+  // every screen is a "tab"; admin-dash.js adds Overview, Advertisers and Products to this list
+  var TABS = [
+    { id: "orders", label: "Orders", order: 20, render: function () { return viewOrdersBody(); }, load: function () { return loadOrders(true); } },
+    { id: "settings", label: "Settings", order: 90, render: function () { return viewSettings(); }, load: function () { return loadDz(); } }
+  ];
+  function sortedTabs() { return TABS.slice().sort(function (a, b) { return a.order - b.order; }); }
+  function tabById(id) { return TABS.filter(function (t) { return t.id === id; })[0]; }
   function viewShell() {
-    return '<nav class="aseg"><button type="button" data-tab="orders" class="' + (S.tab === "orders" ? "on" : "") + '">Orders</button>' +
-      '<button type="button" data-tab="settings" class="' + (S.tab === "settings" ? "on" : "") + '">Settings</button></nav>' +
-      '<div id="tabbody">' + (S.tab === "orders" ? viewOrdersBody() : viewSettings()) + "</div>";
+    return '<nav class="aseg">' + sortedTabs().map(function (t) {
+      return '<button type="button" data-tab="' + t.id + '" class="' + (S.tab === t.id ? "on" : "") + '">' + esc(t.label) + "</button>";
+    }).join("") + '</nav><div id="tabbody"></div>';
   }
   function viewOrdersBody() {
     return '<div class="asearch"><input id="oq" type="search" placeholder="Search name, phone, order number…" value="' + esc(S.q) + '"><button id="oref" class="abtn ghost" type="button">↻</button></div>' +
@@ -229,13 +236,29 @@
       '<div class="oact"><button class="abtn" type="button" data-set="test">Test connection</button>' +
       '<button class="abtn" type="button" data-set="webhook">Connect webhook</button>' +
       '<button class="abtn ghost" type="button" data-set="reconcile">Check order statuses now</button></div>' +
+      ["test", "webhook", "reconcile"].filter(function (k) { return S.dzLog[k]; }).map(function (k) {
+        return '<p class="small dzmsg"><b>' + { test: "Test connection", webhook: "Connect webhook", reconcile: "Order check" }[k] + ":</b> " + esc(S.dzLog[k]) + "</p>";
+      }).join("") +
+      (S.dzDetail ? '<p class="small dzmsg"><b>DropDZ replied:</b> <span dir="ltr">' + esc(S.dzDetail) + "</span></p>" : "") +
       (S.dzMsg ? '<p class="small dzmsg">' + esc(S.dzMsg) + "</p>" : "") +
       '<p class="muted small">Signed in as <b>' + esc(S.me) + "</b>. Webhook address: <span dir=\"ltr\">" + esc(location.origin) + "/api/dropdz-webhook</span></p></section>";
   }
 
   function paint() {
-    var body = document.getElementById("tabbody");
-    if (body) { body.innerHTML = S.tab === "orders" ? viewOrdersBody() : viewSettings(); }
+    var body = document.getElementById("tabbody"), tb = tabById(S.tab);
+    if (!body || !tb) return;
+    body.innerHTML = tb.render();
+    if (tb.mount) tb.mount(body);
+  }
+  function syncNav() {
+    document.querySelectorAll(".aseg button").forEach(function (b) { b.classList.toggle("on", b.dataset.tab === S.tab); });
+  }
+  function goto(id) {
+    if (!tabById(id)) return;
+    S.tab = id; syncNav(); paint();
+    var tb = tabById(id);
+    if (tb && tb.load) tb.load();
+    window.scrollTo(0, 0);
   }
   function paintList() {
     var l = document.getElementById("olist"), c = document.getElementById("chips");
@@ -273,8 +296,15 @@
       if (isAdmin !== true) { app.innerHTML = viewNoAccess(); return; }
       var u = (s.user && (s.user.user_metadata || {})) || {};
       S.me = u.full_name || u.name || (s.user && s.user.email) || "admin";
+      if (!S.tab || !tabById(S.tab)) S.tab = sortedTabs()[0].id;
       app.innerHTML = viewShell();
-      await loadOrders();
+      paint();
+      rpc("admin_order_counts").then(function (c) {
+        S.counts = c || {};
+        document.title = ((S.counts["new"] || 0) ? "(" + S.counts["new"] + ") " : "") + "Admin — Kampus Store";
+      }).catch(function () {});
+      var first = tabById(S.tab);
+      if (first && first.load) await first.load();
       clearInterval(timer);
       timer = setInterval(function () { if (!document.hidden && S.tab === "orders") loadOrders(true); }, 30000);
       // no cron on the free Cloudflare plan: while this page is open, ask DropDZ for fresh statuses every 10 minutes
@@ -335,12 +365,13 @@
     paint();
   }
   async function settingAction(kind) {
-    S.dzMsg = "Working…"; paint();
+    S.dzLog[kind] = "Working…"; S.dzDetail = ""; paint();
     try {
       var r = kind === "test" ? await server("dropdz-test", {}) : kind === "webhook" ? await server("dropdz-webhook-register", {}) : await server("reconcile", {});
-      S.dzMsg = kind === "reconcile" ? "Checked " + r.checked + " orders, updated " + r.updated + (r.failed ? ", failed " + r.failed : "") + "." : (r.message || (r.ok ? "Done." : "Failed."));
-      if (r.fields_returned && !r.secret_saved) S.dzMsg += " Fields: " + r.fields_returned.join(", ");
-    } catch (e) { S.dzMsg = e.message; }
+      if (kind === "reconcile") S.dzLog[kind] = "Checked " + r.checked + " orders, updated " + r.updated + (r.failed ? ", failed " + r.failed : "") + ".";
+      else S.dzLog[kind] = (r.ok === false ? "✗ " : "") + (r.message || (r.ok ? "Done." : "Failed."));
+      if (r.detail) S.dzDetail = JSON.stringify(r.detail).slice(0, 400);
+    } catch (e) { S.dzLog[kind] = "✗ " + e.message; }
     await loadDz();
   }
 
@@ -349,7 +380,7 @@
     var t = ev.target.closest("button");
     if (!t) return;
     if (t.id === "google") { t.disabled = true; startGoogle(); return; }
-    if (t.dataset.tab) { S.tab = t.dataset.tab; paint(); document.querySelectorAll(".aseg button").forEach(function (b) { b.classList.toggle("on", b.dataset.tab === S.tab); }); if (S.tab === "settings") loadDz(); else loadOrders(true); return; }
+    if (t.dataset.tab) { goto(t.dataset.tab); return; }
     if (t.dataset.group) { S.group = t.dataset.group; S.loadedOnce = false; paintList(); loadOrders(); return; }
     if (t.id === "oref") { loadOrders(); return; }
     if (t.dataset.set) { settingAction(t.dataset.set); return; }
@@ -382,8 +413,15 @@
     route();
   });
 
+  // tools shared with admin-dash.js
+  window.AdminKit = {
+    S: S, rpc: rpc, server: server, esc: esc, money: money, toast: toast, goto: goto,
+    register: function (t) { if (!tabById(t.id)) TABS.push(t); },
+    repaint: function () { paint(); }
+  };
+
   // ---------- start ----------
-  (async function init() {
+  async function init() {
     var r = takeOAuthResult(), msg = "";
     if (r && r.error) msg = "Google sign-in failed. Please try again.";
     else if (r && r.access_token) {
@@ -395,5 +433,8 @@
     }
     if (msg) { setTop(false); app.innerHTML = viewAuth(msg); return; }
     route();
-  })();
+  }
+  // wait until all page scripts (including admin-dash.js) have loaded before showing anything
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+  else init();
 })();
