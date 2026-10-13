@@ -1,5 +1,5 @@
 import { BRAND, pickLang } from "./_lib/i18n.js";
-import { PSTR } from "./_lib/partner_i18n.js";
+import { PSTR, CAPTIONS, STORY } from "./_lib/partner_i18n.js";
 import { esc, waFloat } from "./_lib/layout.js";
 
 // The advertiser (partners) website shell. All the logic runs in /partners.js
@@ -15,6 +15,8 @@ export async function onRequestGet({ request, env }) {
     store: String(env.STORE_URL || origin).replace(/\/$/, ""),
     lang,
     T: t,
+    caps: CAPTIONS,
+    story: STORY,
   };
   const cfgJson = JSON.stringify(cfg).replace(/</g, "\\u003c");
 
@@ -53,6 +55,7 @@ export async function onRequestGet({ request, env }) {
 ${waFloat(lang, origin + "/partners")}
 <script>window.__CFG=${cfgJson};</script>
 <script src="/partners-app.js"></script>
+<script src="/partners-promote.js"></script>
 <script>setTimeout(function(){if(!window.__PARTNERS_OK){var a=document.getElementById("app");if(a)a.innerHTML='<p class="error center pad">'+window.__CFG.T.loadFail+"</p>";}},6000);</script>
 </body>
 </html>`;
