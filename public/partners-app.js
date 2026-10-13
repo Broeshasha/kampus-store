@@ -11,8 +11,7 @@
 
   var S = {
     tab: "overview", dash: null, userName: "",
-    products: [], orders: [], payouts: [], wilayas: [],
-    profile: null, form: null,
+    products: [], orders: [], payouts: [], wilayas: [], picks: [], clicks: [],
     msg: "", msgOk: false
   };
   var routing = false;
@@ -143,7 +142,7 @@
   }
   function errText(err) {
     var m = String((err && (err.message || err)) || "").toLowerCase();
-    var keys = ["invalid_name", "invalid_phone", "invalid_wilaya", "invalid_country"];
+    var keys = ["invalid_name", "invalid_phone", "invalid_wilaya"];
     for (var i = 0; i < keys.length; i++) if (m.indexOf(keys[i]) > -1) return E[keys[i]];
     return E.generic;
   }
@@ -152,75 +151,6 @@
   }
   function storeLink() { return CFG.store + "/?ref=" + encodeURIComponent(S.dash.promo_code); }
   function setLoggedIn(on) { document.getElementById("logout").hidden = !on; }
-
-  // ---------- countries & phone numbers ----------
-  // ISO country code : dial code.  Algeria first = default. (the screen sorts the rest by name)
-  var DIAL_RAW = "DZ:213,US:1,GB:44,RU:7,AF:93,AL:355,AD:376,AO:244,AI:1,AG:1,AR:54,AM:374,AW:297,AU:61,AT:43,AZ:994,BS:1,BH:973,BD:880,BB:1,BY:375,BE:32,BZ:501,BJ:229,BM:1,BT:975,BO:591,BA:387,BW:267,BR:55,BN:673,BG:359,BF:226,BI:257,KH:855,CM:237,CA:1,CV:238,KY:1,CF:236,TD:235,CL:56,CN:86,CO:57,KM:269,CG:242,CD:243,CR:506,CI:225,HR:385,CU:53,CY:357,CZ:420,DK:45,DJ:253,DM:1,DO:1,EC:593,EG:20,SV:503,GQ:240,ER:291,EE:372,SZ:268,ET:251,FJ:679,FI:358,FR:33,GA:241,GM:220,GE:995,DE:49,GH:233,GR:30,GD:1,GT:502,GN:224,GW:245,GY:592,HT:509,HN:504,HK:852,HU:36,IS:354,IN:91,ID:62,IR:98,IQ:964,IE:353,IL:972,IT:39,JM:1,JP:81,JO:962,KZ:7,KE:254,KI:686,XK:383,KW:965,KG:996,LA:856,LV:371,LB:961,LS:266,LR:231,LY:218,LI:423,LT:370,LU:352,MO:853,MG:261,MW:265,MY:60,MV:960,ML:223,MT:356,MH:692,MR:222,MU:230,MX:52,FM:691,MD:373,MC:377,MN:976,ME:382,MA:212,MZ:258,MM:95,NA:264,NR:674,NP:977,NL:31,NZ:64,NI:505,NE:227,NG:234,KP:850,MK:389,NO:47,OM:968,PK:92,PW:680,PS:970,PA:507,PG:675,PY:595,PE:51,PH:63,PL:48,PT:351,PR:1,QA:974,RO:40,RW:250,KN:1,LC:1,VC:1,WS:685,SM:378,ST:239,SA:966,SN:221,RS:381,SC:248,SL:232,SG:65,SK:421,SI:386,SB:677,SO:252,ZA:27,KR:82,SS:211,ES:34,LK:94,SD:249,SR:597,SE:46,CH:41,SY:963,TW:886,TJ:992,TZ:255,TH:66,TL:670,TG:228,TO:676,TT:1,TN:216,TR:90,TM:993,TV:688,UG:256,UA:380,AE:971,UY:598,UZ:998,VU:678,VE:58,VN:84,YE:967,ZM:260,ZW:263,GP:590,MQ:596,RE:262,GF:594,NC:687,PF:689,GL:299,FO:298,GI:350,JE:44,GG:44,IM:44,CW:599,SX:1,MS:1,TC:1,VG:1,VI:1,GU:1,MP:1";
-  var DEFAULT_COUNTRY = "DZ";
-  var DIAL = {}, CODES = [];
-  DIAL_RAW.split(",").forEach(function (p) { var a = p.split(":"); DIAL[a[0]] = a[1]; CODES.push(a[0]); });
-  var E164 = /^\+[1-9]\d{6,14}$/;
-
-  var regionNames = null;
-  try { regionNames = new Intl.DisplayNames([CFG.lang === "ar" ? "ar" : CFG.lang === "fr" ? "fr" : "en"], { type: "region" }); } catch (e) {}
-  function countryName(c) { try { return (regionNames && regionNames.of(c)) || c; } catch (e) { return c; } }
-  function flag(c) {
-    try { return String.fromCodePoint(0x1F1E6 + c.charCodeAt(0) - 65, 0x1F1E6 + c.charCodeAt(1) - 65); } catch (e) { return ""; }
-  }
-  var sortedCountries = null;
-  function countryOptions(sel) {
-    if (!sortedCountries) {
-      var cmp = function (a, b) { return a.n.localeCompare(b.n, CFG.lang); };
-      var all = CODES.map(function (c) { return { c: c, n: countryName(c) }; }).filter(function (x) { return x.c !== DEFAULT_COUNTRY; }).sort(cmp);
-      all.unshift({ c: DEFAULT_COUNTRY, n: countryName(DEFAULT_COUNTRY) });
-      sortedCountries = all;
-    }
-    return sortedCountries.map(function (x) {
-      return '<option value="' + x.c + '"' + (x.c === sel ? " selected" : "") + ">" + esc(flag(x.c) + " " + x.n + " (+" + DIAL[x.c] + ")") + "</option>";
-    }).join("");
-  }
-
-  // which country does this international number (digits only, no +) belong to?
-  function detectCountry(digits, current) {
-    if (DIAL[current] && digits.indexOf(DIAL[current]) === 0) return current;
-    for (var len = 3; len >= 1; len--) {
-      var pre = digits.slice(0, len);
-      for (var i = 0; i < CODES.length; i++) if (DIAL[CODES[i]] === pre) return CODES[i];
-    }
-    return null;
-  }
-  // what the person typed + the chosen country  ->  { phone: "+263771234567", country: "ZW" }  (or null if not valid)
-  function toE164(input, country) {
-    var raw = String(input || "").trim();
-    var digits = raw.replace(/\D/g, "");
-    if (!digits) return null;
-    var phone;
-    if (/^(\+|00)/.test(raw)) {                 // typed with + or 00: full international number
-      digits = digits.replace(/^00/, "");
-      var c2 = detectCountry(digits, country);
-      if (!c2) return null;
-      country = c2;
-      phone = "+" + digits;
-    } else if (country === "DZ") {              // Algeria: 05.. / 06.. / 07..  or  5.. / 6.. / 7..
-      if (/^0[567]\d{8}$/.test(digits)) digits = digits.slice(1);
-      phone = "+213" + digits;
-    } else {                                    // any other country: dial code + number (leading 0 removed)
-      phone = "+" + DIAL[country] + digits.replace(/^0+/, "");
-    }
-    if (!E164.test(phone)) return null;
-    if (country === "DZ" && !/^\+213[567]\d{8}$/.test(phone)) return null;
-    return { phone: phone, country: country };
-  }
-  // saved phone -> what we show in the box (without the dial code)
-  function natFromStored(phone, country) {
-    var raw = String(phone || ""), d = raw.replace(/\D/g, "");
-    if (!d) return "";
-    if (raw.charAt(0) !== "+") return d;        // older accounts: 0555123456
-    var dial = DIAL[country] || "";
-    if (!dial || d.indexOf(dial) !== 0) return raw;
-    d = d.slice(dial.length);
-    return country === "DZ" ? "0" + d : d;
-  }
 
   // ---------- language buttons ----------
   document.querySelectorAll("[data-lang]").forEach(function (b) {
@@ -244,38 +174,16 @@
       '<button id="google" class="gbtn" type="button">' + G_ICON + "<span>" + esc(T.google) + "</span></button></section>";
   }
 
-  // one form used by "create account" and by "my profile"
-  function profileForm(id, v, btn) {
-    var wopts = '<option value="">' + esc(T.chooseWilaya) + "</option>" +
-      S.wilayas.map(function (w) {
-        return '<option value="' + esc(w.id) + '"' + (String(w.id) === String(v.wilaya) ? " selected" : "") + ">" + esc(w.name) + "</option>";
-      }).join("");
-    return '<form id="' + id + '" class="form flat" novalidate>' +
-      "<label>" + esc(T.name) + '<input name="name" autocomplete="name" value="' + esc(v.name) + '" required></label>' +
-      "<label>" + esc(T.country) + '<select name="country">' + countryOptions(v.country) + "</select></label>" +
-      "<label>" + esc(T.phone) + '<span class="phone-row" dir="ltr"><span class="dial">+' + esc(DIAL[v.country] || "") + '</span>' +
-        '<input name="phone" type="tel" inputmode="tel" dir="ltr" autocomplete="tel-national" value="' + esc(v.nat) + '" required></span></label>' +
-      '<p class="muted small">' + esc(T.phoneHint) + "</p>" +
-      '<label class="wilaya-wrap"' + (v.country === "DZ" ? "" : " hidden") + ">" + esc(T.wilaya) + '<select name="wilaya">' + wopts + "</select></label>" +
-      msgHtml() +
-      '<button class="btn big" type="submit">' + esc(btn) + "</button></form>";
-  }
-
   function viewRegister() {
-    var v = S.form || { name: S.userName, country: DEFAULT_COUNTRY, nat: "", wilaya: "" };
+    var opts = '<option value="">' + esc(T.chooseWilaya) + "</option>" +
+      S.wilayas.map(function (w) { return '<option value="' + esc(w.id) + '">' + esc(w.name) + "</option>"; }).join("");
     return '<section class="box auth"><h1>' + esc(T.registerTitle) + '</h1><p class="muted">' + esc(T.registerHint) + "</p>" +
-      profileForm("reg-form", v, T.createBtn) + "</section>";
-  }
-
-  function viewProfile() {
-    var p = S.profile || {};
-    var country = p.phone_country || DEFAULT_COUNTRY;
-    var v = S.form || {
-      name: p.display_name || S.dash.display_name || "", country: country,
-      nat: natFromStored(p.phone, country), wilaya: p.wilaya_id || ""
-    };
-    return '<div class="box"><h3>' + esc(T.profileTitle) + "</h3>" + profileForm("prof-form", v, T.saveBtn) + "</div>" +
-      '<p class="muted small center">' + esc(T.promoLocked) + "</p>";
+      '<form id="reg-form" class="form flat" novalidate>' +
+        "<label>" + esc(T.name) + '<input name="name" autocomplete="name" value="' + esc(S.userName) + '" required></label>' +
+        "<label>" + esc(T.phone) + '<input name="phone" type="tel" dir="ltr" autocomplete="tel" required></label>' +
+        "<label>" + esc(T.wilaya) + '<select name="wilaya" required>' + opts + "</select></label>" +
+        msgHtml() +
+        '<button class="btn big" type="submit">' + esc(T.createBtn) + "</button></form></section>";
   }
 
   function viewInactive() { return '<section class="box center"><p>' + esc(T.inactive) + "</p></section>"; }
@@ -292,7 +200,18 @@
           return '<li><span>' + esc(fmtDate(p.paid_at)) + (p.method ? " · " + esc(p.method) : "") + "</span><b>" + money(p.amount_dzd) + "</b></li>";
         }).join("")
       : '<li class="muted">' + esc(T.noPayments) + "</li>";
-    return '<div class="stats">' +
+    var PR = T.pr || {};
+    var guideDone = false;
+    try { guideDone = localStorage.getItem("kampus_guide_done") === "1"; } catch (e) {}
+    var guide = guideDone || !PR.guide ? "" : '<div class="box guide"><h3>' + esc(PR.guideTitle) + "</h3><ol>" +
+      PR.guide.map(function (g) { return "<li>" + esc(g) + "</li>"; }).join("") + '</ol><button type="button" class="mini solid" data-guide-close="1">' + esc(PR.gotIt) + "</button></div>";
+    var tc = 0, to = 0;
+    S.clicks.forEach(function (c) { tc += c.clicks || 0; to += c.orders || 0; });
+    var myPage = CFG.store + "/a/" + d.promo_code;
+    var pageBox = PR.myPage ? '<div class="box"><div class="kv"><span>' + esc(PR.myPage) + " — " + esc(PR.myPageHint) + '</span><b class="url" dir="ltr">' + esc(myPage) + "</b>" +
+      '<button class="mini" type="button" data-copy="' + esc(myPage) + '">' + esc(T.copy) + "</button>" +
+      '<button class="mini" type="button" data-share data-url="' + esc(myPage) + '" data-title="Kampus Store">' + esc(T.share) + "</button></div></div>" : "";
+    return guide + '<div class="stats">' +
         statBox(T.balance, money(d.balance_dzd), "main", T.balanceHint) +
         statBox(T.pending, money(d.pending_dzd)) +
         statBox(T.earned, money(d.earned_dzd)) +
@@ -301,11 +220,13 @@
         statBox(T.delivered, d.orders_delivered) +
       "</div>" +
       '<p class="muted small center">' + esc(fill(T.rate, { p: d.commission_percent })) + "</p>" +
+      (PR.statsLine ? '<p class="muted small center">' + esc(fill(PR.statsLine, { c: tc, o: to })) + "</p>" : "") +
       '<div class="box"><div class="kv"><span>' + esc(T.yourCode) + '</span><b class="code" dir="ltr">' + esc(d.promo_code) + "</b>" +
         '<button class="mini" type="button" data-copy="' + esc(d.promo_code) + '">' + esc(T.copy) + "</button></div>" +
       '<div class="kv"><span>' + esc(T.yourLink) + '</span><b class="url" dir="ltr">' + esc(storeLink()) + "</b>" +
         '<button class="mini" type="button" data-copy="' + esc(storeLink()) + '">' + esc(T.copy) + "</button>" +
         '<button class="mini" type="button" data-share data-url="' + esc(storeLink()) + '" data-title="' + esc(fill(T.shareText, { name: "Kampus Store" })) + '">' + esc(T.share) + "</button></div></div>" +
+      pageBox +
       '<div class="box"><h3>' + esc(T.payments) + '</h3><ul class="list">' + pays + "</ul></div>";
   }
 
@@ -317,15 +238,16 @@
       var stockCls = p.stock <= 0 ? "out" : p.stock <= 5 ? "low" : "";
       var url = linkFor(p.slug);
       return '<article class="pcard" data-name="' + esc(String(p.name || "").toLowerCase()) + '">' +
-        '<div class="pimg">' + (img ? '<img loading="lazy" src="' + esc(img) + '" alt="">' : "") + "</div>" +
-        '<div class="pinfo"><h3>' + esc(p.name) + "</h3>" +
+        '<button type="button" class="pimg pbtn" data-promote="' + esc(p.slug) + '">' + (img ? '<img loading="lazy" src="' + esc(img) + '" alt="">' : "") + "</button>" +
+        '<div class="pinfo"><h3>' + esc(p.name) + (S.picks.indexOf(p.id) > -1 ? ' <span title="My page">⭐</span>' : "") + "</h3>" +
           '<div class="muted small">' + esc(T.price) + ": " + money(p.sell_price) + "</div>" +
           '<div class="earn">' + esc(T.earnPer) + " <b>" + money(p.earn_per_unit) + "</b> " + esc(T.perSale) + "</div>" +
           '<div class="stock ' + stockCls + '">' + esc(stockTxt) +
             (p.stock > 0 && p.earn_per_unit > 0 ? " · " + esc(T.ifSoldAll) + ": <b>" + money(p.stock * p.earn_per_unit) + "</b>" : "") + "</div>" +
           '<div class="actions">' +
+            '<button class="mini solid" type="button" data-promote="' + esc(p.slug) + '">📣 ' + esc((T.pr || {}).promote || "Promote") + "</button>" +
             '<button class="mini" type="button" data-copy="' + esc(url) + '">' + esc(T.copyLink) + "</button>" +
-            '<button class="mini solid" type="button" data-share data-url="' + esc(url) + '" data-title="' + esc(fill(T.shareText, { name: p.name })) + '">' + esc(T.share) + "</button>" +
+            '<button class="mini" type="button" data-share data-url="' + esc(url) + '" data-title="' + esc(fill(T.shareText, { name: p.name })) + '">' + esc(T.share) + "</button>" +
           "</div></div></article>";
     }).join("");
     return '<input id="pq" class="search" type="search" placeholder="' + esc(T.searchProducts) + '">' +
@@ -352,8 +274,8 @@
   }
 
   function viewDash() {
-    var tabs = [["overview", T.overview], ["products", T.products], ["orders", T.orders], ["profile", T.profile]];
-    var body = S.tab === "products" ? viewProducts() : S.tab === "orders" ? viewOrders() : S.tab === "profile" ? viewProfile() : viewOverview();
+    var tabs = [["overview", T.overview], ["products", T.products], ["orders", T.orders]];
+    var body = S.tab === "products" ? viewProducts() : S.tab === "orders" ? viewOrders() : viewOverview();
     return '<div class="greet"><h1>' + esc(fill(T.hi, { name: S.dash.display_name })) + "</h1>" +
       '<button id="refresh" class="mini" type="button">↻ ' + esc(T.refresh) + "</button></div>" +
       '<nav class="seg tabs">' + tabs.map(function (t) {
@@ -378,14 +300,15 @@
       rpc("get_my_products").catch(soft),
       rpc("get_my_orders").catch(soft),
       rest("advertiser_payouts?select=amount_dzd,method,paid_at&voided_at=is.null&order=paid_at.desc").catch(soft),
-      rpc("get_my_profile").catch(soft),
-      loadWilayas().catch(soft)
+      rpc("get_my_picks").catch(soft),
+      rpc("get_my_clicks").catch(soft)
     ]);
     if (r[0] && !r[0].inactive) S.dash = r[0];
     S.products = r[1] || [];
     S.orders = r[2] || [];
     S.payouts = r[3] || [];
-    S.profile = r[4] || null;
+    S.picks = (r[4] || []).map(function (x) { return x.product_id; });
+    S.clicks = r[5] || [];
   }
 
   async function route() {
@@ -412,12 +335,19 @@
     }
   }
 
+  // tools for partners-promote.js
+  window.PartnerKit = {
+    CFG: CFG, T: T, S: S, esc: esc, money: money, fill: fill, toast: toast, rpc: rpc,
+    linkFor: linkFor, storeLink: storeLink,
+    reload: function () { return loadAll().then(function () { render("dash"); }); }
+  };
+
   // ---------- events ----------
   app.addEventListener("click", function (ev) {
     var t = ev.target.closest("button");
     if (!t) return;
     if (t.id === "google") { t.disabled = true; startGoogle(); return; }
-    if (t.dataset.tab) { S.tab = t.dataset.tab; S.msg = ""; S.form = null; render("dash"); return; }
+    if (t.dataset.tab) { S.tab = t.dataset.tab; render("dash"); return; }
     if (t.dataset.copy) {
       (navigator.clipboard ? navigator.clipboard.writeText(t.dataset.copy) : Promise.reject())
         .then(function () { toast(T.copied); })
@@ -430,75 +360,32 @@
       else if (navigator.clipboard) navigator.clipboard.writeText(url).then(function () { toast(T.copied); });
       return;
     }
+    if (t.dataset.guideClose) { try { localStorage.setItem("kampus_guide_done", "1"); } catch (e) {} render("dash"); return; }
     if (t.id === "refresh") { loadAll().then(function () { render("dash"); }).catch(function () {}); }
   });
 
-  // keep the "+213" box and the wilaya field in step with the chosen country
-  function syncCountry(f) {
-    var c = f.elements.country.value;
-    var dial = f.querySelector(".dial");
-    if (dial) dial.textContent = "+" + (DIAL[c] || "");
-    var w = f.querySelector(".wilaya-wrap");
-    if (w) w.hidden = c !== DEFAULT_COUNTRY;
-  }
-  app.addEventListener("change", function (ev) {
-    var el = ev.target;
-    if (el && el.name === "country" && el.form) syncCountry(el.form);
-  });
-
   app.addEventListener("input", function (ev) {
-    var el = ev.target;
-    if (el.id === "pq") {
-      var term = el.value.trim().toLowerCase();
-      app.querySelectorAll(".pcard").forEach(function (c) { c.hidden = term && c.dataset.name.indexOf(term) === -1; });
-      return;
-    }
-    // number typed with + : pick the matching country automatically
-    if (el.name === "phone" && el.form && /^\s*\+/.test(el.value)) {
-      var c = detectCountry(el.value.replace(/\D/g, ""), el.form.elements.country.value);
-      if (c && c !== el.form.elements.country.value) { el.form.elements.country.value = c; syncCountry(el.form); }
-    }
+    if (ev.target.id !== "pq") return;
+    var term = ev.target.value.trim().toLowerCase();
+    app.querySelectorAll(".pcard").forEach(function (c) { c.hidden = term && c.dataset.name.indexOf(term) === -1; });
   });
-
-  // read + check the form; returns { v: values to show again, args: values for the server, err: error key }
-  function readProfile(f) {
-    var country = f.elements.country.value;
-    var v = { name: f.elements.name.value, country: country, nat: f.elements.phone.value, wilaya: f.elements.wilaya.value };
-    if (v.name.trim().length < 3) return { v: v, err: "invalid_name" };
-    var ph = toE164(v.nat, country);
-    if (!ph) return { v: v, err: "invalid_phone" };
-    v.country = ph.country;
-    var wid = parseInt(v.wilaya, 10);
-    if (ph.country === DEFAULT_COUNTRY && !(wid > 0)) return { v: v, err: "invalid_wilaya" };
-    return { v: v, args: { p_name: v.name.trim(), p_phone: ph.phone, p_wilaya: ph.country === DEFAULT_COUNTRY ? wid : null, p_country: ph.country } };
-  }
 
   app.addEventListener("submit", async function (ev) {
     ev.preventDefault();
     var f = ev.target;
-    if (f.id !== "reg-form" && f.id !== "prof-form") return;
-    var isReg = f.id === "reg-form";
+    if (f.id !== "reg-form") return;
     var btn = f.querySelector("button[type=submit]");
-    S.msg = ""; S.msgOk = false;
-    var r = readProfile(f);
-    S.form = r.v;
-    if (r.err) { S.msg = E[r.err] || E.generic; render(isReg ? "register" : "dash"); return; }
     btn.disabled = true;
+    S.msg = ""; S.msgOk = false;
     try {
-      if (isReg) {
-        await rpc("register_advertiser", r.args);
-        S.form = null;
-        await route();
-      } else {
-        var saved = await rpc("update_my_profile", r.args);
-        S.profile = saved || S.profile;
-        if (S.dash) S.dash.display_name = r.args.p_name;
-        S.form = null; S.msg = T.saved; S.msgOk = true;
-        render("dash");
-      }
+      await rpc("register_advertiser", {
+        p_name: f.elements.name.value, p_phone: f.elements.phone.value, p_wilaya: parseInt(f.elements.wilaya.value, 10)
+      });
+      await route();
     } catch (e) {
       S.msg = errText(e);
-      render(isReg ? "register" : "dash");
+      S.userName = f.elements.name.value;
+      render("register");
     }
   });
 
