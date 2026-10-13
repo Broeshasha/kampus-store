@@ -1,8 +1,9 @@
 import { BRAND, STRINGS, pickLang } from "../_lib/i18n.js";
 import { sbGet } from "../_lib/supa.js";
 import { page, esc, money, allImages, shareIcon, backIcon } from "../_lib/layout.js";
+import { trackVisit } from "../_lib/track.js";
 
-export async function onRequestGet({ request, env, params }) {
+export async function onRequestGet({ request, env, ctx, params }) {
   const lang = pickLang(request);
   const t = STRINGS[lang];
   const origin = new URL(request.url).origin;
@@ -81,11 +82,14 @@ export async function onRequestGet({ request, env, params }) {
   <div class="info">
     <h1>${esc(product.name)}</h1>
     <div class="price big">${money(product.sell_price, t.currency)}</div>
-    <button class="share-btn" type="button" data-share data-url="/p/${encodeURIComponent(product.slug)}" data-title="${esc(product.name)}">${shareIcon} <span>${esc(t.share)}</span></button>
+    <button class="share-btn" type="button" data-share data-url="/p/${encodeURIComponent(product.slug)}" data-title="${esc(product.name)}" data-price="${esc(money(product.sell_price, t.currency))}" data-img="${esc(imgs[0] || "")}">${shareIcon} <span>${esc(t.share)}</span></button>
     ${product.description ? `<p class="desc">${esc(product.description)}</p>` : ""}
     ${form}
   </div>
 </section>`;
 
-  return page({ lang, origin, title: `${product.name} — ${BRAND.name}`, description: desc, image: imgs[0] || "", url, body });
+  const res = page({ lang, origin, title: `${product.name} — ${BRAND.name}`, description: desc, image: imgs[0] || "", url, body });
+  const cookie = trackVisit(request, env, ctx, product.slug);
+  if (cookie) res.headers.append("set-cookie", cookie);
+  return res;
 }
