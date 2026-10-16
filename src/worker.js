@@ -7,6 +7,7 @@ import * as communes from "../functions/api/communes.js";
 import * as partners from "../functions/partners.js";
 import * as adminPage from "../functions/admin-page.js";
 import * as aPage from "../functions/a-page.js";
+import * as storePage from "../functions/store-page.js";
 import * as img from "../functions/api/img.js";
 import { handleAdmin } from "../functions/api/admin-api.js";
 import * as dropdzWebhook from "../functions/api/dropdz-webhook.js";
@@ -26,6 +27,9 @@ export default {
       if (p && isRead) {
         return await product.onRequestGet({ request, env, ctx, params: { slug: decodeURIComponent(p[1]) } });
       }
+
+      const st = path.match(/^\/s\/([^/]+)\/?$/);
+      if (st && isRead) return await storePage.onRequestGet({ request, env, ctx, params: { slug: decodeURIComponent(st[1]) } });
 
       const a = path.match(/^\/a\/([^/]+)\/?$/);
       if (a && isRead) return await aPage.onRequestGet({ request, env, ctx, params: { code: decodeURIComponent(a[1]) } });
