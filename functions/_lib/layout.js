@@ -73,7 +73,7 @@ export function waFloat(lang, pageUrl) {
   return `<a class="wa-float" href="https://wa.me/${BRAND.whatsapp}?text=${encodeURIComponent(text)}" target="_blank" rel="noopener" aria-label="${esc(t.waLabel)}"><svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true"><path fill="#fff" d="${WA_PATH}"/></svg><span>${esc(t.waLabel)}</span></a>`;
 }
 
-export function page({ lang, origin, title, description = "", image = "", url = "", body, status = 200, refCode = "" }) {
+export function page({ lang, origin, title, description = "", image = "", url = "", body, status = 200, refCode = "", brandHtml = "", footHtml = "", extraCss = "", themeColor = "#3e7bfa", siteName = "", icon = "" }) {
   const t = STRINGS[lang];
   const marquee = t.marquee.map((x) => `<span>${esc(x)}</span>`).join("");
   const tJson = JSON.stringify(t).replace(/</g, "\\u003c");
@@ -93,10 +93,10 @@ export function page({ lang, origin, title, description = "", image = "", url = 
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${esc(title)}</title>
 <meta name="description" content="${esc(description)}">
-<meta name="theme-color" content="#3e7bfa">
-<link rel="icon" href="${BRAND.logo}">
-<link rel="apple-touch-icon" href="${BRAND.logo}">
-<meta property="og:site_name" content="${esc(BRAND.name)}">
+<meta name="theme-color" content="${esc(themeColor)}">
+<link rel="icon" href="${esc(icon || BRAND.logo)}">
+<link rel="apple-touch-icon" href="${esc(icon || BRAND.logo)}">
+<meta property="og:site_name" content="${esc(siteName || BRAND.name)}">
 <meta property="og:title" content="${esc(title)}">
 <meta property="og:description" content="${esc(description)}">
 <meta property="og:type" content="website">
@@ -107,17 +107,18 @@ ${url ? `<meta property="og:url" content="${esc(url)}">` : ""}
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/style.css">
+${extraCss ? `<style>${extraCss}</style>` : ""}
 </head>
 <body>
 <div class="marquee"><div class="track">${marquee}${marquee}${marquee}${marquee}</div></div>
 <header class="top">
   <div class="top-in">
-    <a href="/" class="brand"><img src="${BRAND.logo}" alt="" class="logo"><span>${esc(BRAND.name)}</span></a>
+    ${brandHtml || `<a href="/" class="brand"><img src="${BRAND.logo}" alt="" class="logo"><span>${esc(BRAND.name)}</span></a>`}
     <div class="langs">${switcher}</div>
   </div>
 </header>
 <main>${body}</main>
-<footer class="foot">© ${new Date().getFullYear()} ${esc(BRAND.name)}</footer>
+<footer class="foot">${footHtml || `© ${new Date().getFullYear()} ${esc(BRAND.name)}`}</footer>
 <div id="toast" class="toast" hidden></div>
 ${waFloat(lang, url)}
 <script>window.__T=${tJson};window.__REF=${JSON.stringify(String(refCode || ''))};</script>
