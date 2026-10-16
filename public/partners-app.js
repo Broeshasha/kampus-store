@@ -274,8 +274,8 @@
   }
 
   function viewDash() {
-    var tabs = [["overview", T.overview], ["products", T.products], ["orders", T.orders]];
-    var body = S.tab === "products" ? viewProducts() : S.tab === "orders" ? viewOrders() : viewOverview();
+    var tabs = [["overview", T.overview], ["products", T.products], ["store", (T.st || {}).tab || "My Store"], ["orders", T.orders]];
+    var body = S.tab === "products" ? viewProducts() : S.tab === "orders" ? viewOrders() : S.tab === "store" ? '<div id="store-root"></div>' : viewOverview();
     return '<div class="greet"><h1>' + esc(fill(T.hi, { name: S.dash.display_name })) + "</h1>" +
       '<button id="refresh" class="mini" type="button">↻ ' + esc(T.refresh) + "</button></div>" +
       '<nav class="seg tabs">' + tabs.map(function (t) {
@@ -286,6 +286,7 @@
   function render(view) {
     var map = { auth: viewAuth, register: viewRegister, inactive: viewInactive, dash: viewDash };
     app.innerHTML = view === "loading" ? '<p class="muted center pad">' + esc(T.loading) + "</p>" : map[view]();
+    if (view === "dash" && S.tab === "store" && window.PartnerStore) window.PartnerStore.mount(document.getElementById("store-root"));
   }
 
   // ---------- data ----------
@@ -339,6 +340,8 @@
   window.PartnerKit = {
     CFG: CFG, T: T, S: S, esc: esc, money: money, fill: fill, toast: toast, rpc: rpc,
     linkFor: linkFor, storeLink: storeLink,
+    API: API, KEY: KEY, getToken: getToken,
+    userId: function () { var s = readSession(); return s && s.user && s.user.id; },
     reload: function () { return loadAll().then(function () { render("dash"); }); }
   };
 
