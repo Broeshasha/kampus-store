@@ -2,6 +2,8 @@ import { BRAND, STRINGS, pickLang } from "../_lib/i18n.js";
 import { sbGet } from "../_lib/supa.js";
 import { page, esc, money, allImages, shareIcon, backIcon } from "../_lib/layout.js";
 import { trackVisit } from "../_lib/track.js";
+import { storeByCode } from "../_lib/store.js";
+import { themeCss, themeOf } from "../_lib/themes.js";
 
 export async function onRequestGet({ request, env, ctx, params }) {
   const lang = pickLang(request);
@@ -88,7 +90,15 @@ export async function onRequestGet({ request, env, ctx, params }) {
   </div>
 </section>`;
 
-  const res = page({ lang, origin, title: `${product.name} — ${BRAND.name}`, description: desc, image: imgs[0] || "", url, body });
+  const refParam = new URL(request.url).searchParams.get("ref");
+  const found = refParam ? await storeByCode(env, refParam) : null;
+  const bar = found
+    ? `<a class="storebar" href="/s/${esc(found.store.slug)}"><img src="${esc(found.store.logo_url || BRAND.logo)}" alt=""><span>${esc(t.selectedBy.replace("{name}", found.store.name))}</span><span>›</span></a>`
+    : "";
+  const res = page({
+    lang, origin, title: `${product.name} — ${BRAND.name}`, description: desc, image: imgs[0] || "", url, body: bar + body,
+    ...(found ? { extraCss: themeCss(found.store.theme), themeColor: themeOf(found.store.theme).head } : {}),
+  });
   const cookie = trackVisit(request, env, ctx, product.slug);
   if (cookie) res.headers.append("set-cookie", cookie);
   return res;
