@@ -102,6 +102,7 @@
   function render() {
     if (!root) return;
     root.innerHTML = '<p class="muted small">' + esc(ST.intro) + "</p>" + sectionHtml();
+    document.body.classList.add("has-stbar");   // lifts the WhatsApp help button above the Publish bar
     bind();
     paintAll();
   }
