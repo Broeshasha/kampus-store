@@ -287,6 +287,8 @@
     var map = { auth: viewAuth, register: viewRegister, inactive: viewInactive, dash: viewDash };
     app.innerHTML = view === "loading" ? '<p class="muted center pad">' + esc(T.loading) + "</p>" : map[view]();
     if (view === "dash" && S.tab === "store" && window.PartnerStore) window.PartnerStore.mount(document.getElementById("store-root"));
+    // the editor has a fixed "Publish" bar at the bottom: lift the WhatsApp help button above it
+    document.body.classList.toggle("has-stbar", !!document.querySelector(".stbar"));
   }
 
   // ---------- data ----------
