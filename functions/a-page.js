@@ -2,6 +2,7 @@ import { BRAND, STRINGS, pickLang } from "./_lib/i18n.js";
 import { sbGet } from "./_lib/supa.js";
 import { page, esc, productCards } from "./_lib/layout.js";
 import { trackVisit } from "./_lib/track.js";
+import { storeByCode } from "./_lib/store.js";
 
 // "My page" of an advertiser:  /a/CODE   (their picks, or the whole store if they picked nothing)
 export async function onRequestGet({ request, env, ctx, params }) {
@@ -10,6 +11,9 @@ export async function onRequestGet({ request, env, ctx, params }) {
   const origin = new URL(request.url).origin;
   const code = String(params.code || "").toUpperCase();
   if (!/^[A-Z0-9_-]{2,30}$/.test(code)) return Response.redirect(origin + "/", 302);
+
+  const mine = await storeByCode(env, code);
+  if (mine) return Response.redirect(`${origin}/s/${mine.store.slug}`, 302);
 
   let adv = null, picks = [], products = [];
   try {
